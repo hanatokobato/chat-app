@@ -1,30 +1,64 @@
 <template>
   <div>
-        <div class="chat">
-            <div class="chat-title">
-                <h1>Chatroom</h1>
-            </div>
-            <div class="messages">
-                <div class="messages-content">
-                    <ChatItem v-for="n in 30" :key="n"></ChatItem>
-                </div>
-            </div>
-            <div class="message-box">
-                <textarea type="text" class="message-input" placeholder="Type message..."></textarea>
-                <button type="submit" class="message-submit">Send</button>
-            </div>
+    <div class="chat">
+      <div class="chat-title">
+        <h1>Chatroom</h1>
+      </div>
+      <div class="messages">
+        <div class="messages-content">
+          <ChatItem v-for="(message, index) in list_messages" :key="index" :message="message"></ChatItem>
         </div>
-        <div class="bg"></div>
+      </div>
+      <div class="message-box">
+        <input type="text" v-model="message" @keyup.enter="sendMessage" class="message-input" placeholder="Type message..."/>
+        <button type="button" class="message-submit" @click="sendMessage">Send</button>
+      </div>
     </div>
+    <div class="bg"></div>
+  </div>
 </template>
 
 <script>
-    import ChatItem from './ChatItem.vue'
-    export default {
-        components: {
-            ChatItem
-        }
+  import axios from "axios";
+  import ChatItem from './ChatItem.vue'
+  export default {
+    components: {
+        ChatItem
+    },
+    data() {
+      return {
+        message: '',
+        list_messages: []
+      }
+    },
+    created () {
+      this.loadMessage()
+    },
+    methods: {
+      loadMessage() {
+        axios.get('/messages')
+        .then(response => {
+          this.list_messages = response.data
+        })
+        .catch(error => {
+          console.log(error)
+        })
+      },
+      sendMessage() {
+        axios.post('/messages', {
+          message: this.message
+        })
+        .then(response => {
+          console.log('success')
+          this.list_messages.push(response.data.message)
+          this.message = ''
+        })
+        .catch(error => {
+          console.log(error)
+        })
+      }
     }
+  }
 </script>
 
 <style lang="scss" scoped>

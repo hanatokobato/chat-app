@@ -6,11 +6,31 @@
 // All it does is render <div>Hello Vue</div> at the bottom of the page.
 
 import Vue from 'vue/dist/vue.esm'
+import axios from 'axios'
+
+let token = document.getElementsByName('csrf-token')[0].getAttribute('content')
+axios.defaults.headers.common['X-CSRF-Token'] = token
+axios.defaults.headers.common['Accept'] = 'application/json'
+
 Vue.component('chat-layout', require('../components/ChatLayout.vue').default)
 
 document.addEventListener('DOMContentLoaded', () => {
   const app = new Vue({
-    el: '#app'
+    el: '#app',
+    data: {
+      currentUserLogin: {}
+    },
+    created() {
+      this.getCurrentUserLogin()
+    },
+    methods: {
+      getCurrentUserLogin() {
+        axios.get('/get_current_user')
+        .then(response => {
+          this.currentUserLogin = response.data
+        })
+      }
+    }
   })
 })
 
