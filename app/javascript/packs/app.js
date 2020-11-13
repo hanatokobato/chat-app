@@ -7,12 +7,20 @@
 
 import Vue from 'vue/dist/vue.esm'
 import axios from 'axios'
+import ActionCableVue from 'actioncable-vue'
 
 let token = document.getElementsByName('csrf-token')[0].getAttribute('content')
 axios.defaults.headers.common['X-CSRF-Token'] = token
 axios.defaults.headers.common['Accept'] = 'application/json'
 
 Vue.component('chat-layout', require('../components/ChatLayout.vue').default)
+
+Vue.use(ActionCableVue, {
+  debug: true,
+  debugLevel: 'error',
+  connectionUrl: 'ws://localhost:3000/cable',
+  connectImmediately: true,
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   const app = new Vue({

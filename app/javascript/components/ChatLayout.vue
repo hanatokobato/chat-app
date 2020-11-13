@@ -31,6 +31,30 @@
         list_messages: []
       }
     },
+    channels: {
+      ChatRoomChannel: {
+        connected() {
+          console.log('I am connected.');
+        },
+        rejected() {
+          debugger
+        },
+        received(data) {
+          let message = data.message
+          message.user = data.user
+          this.list_messages.push(message)
+        },
+        disconnected() {
+          debugger
+        }
+      }
+    },
+    mounted () {
+      this.$cable.subscribe({
+        channel: 'ChatRoomChannel',
+        room: 'chatroom'
+      });
+    },
     created () {
       this.loadMessage()
     },
@@ -50,7 +74,6 @@
         })
         .then(response => {
           console.log('success')
-          this.list_messages.push(response.data.message)
           this.message = ''
         })
         .catch(error => {

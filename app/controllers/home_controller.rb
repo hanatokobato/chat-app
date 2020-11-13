@@ -22,9 +22,9 @@ class HomeController < ApplicationController
     respond_to do |format|
       format.json do
         message = Message.create(user: current_user, message: params[:message])
-        render json: {
-          message: message.as_json(include: :user)
-        }
+        return unless message
+
+        ActionCable.server.broadcast("chatroom", message: message.as_json, user: message.user.as_json)
       end
     end
   end
